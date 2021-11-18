@@ -230,7 +230,7 @@ The details of other contexts will be introduced later.
 
 ### WASM Data Structures
 
-The WASM data structures are used for creating instances or can be queried from intance contexts.
+The WASM data structures are used for creating instances or can be queried from instance contexts.
 The details of instances creation will be introduced in the [Instances](#Instances).
 
 1. Limit
@@ -390,7 +390,11 @@ Developers can adjust the settings about the proposals, VM host pre-registration
 
     ```c
     enum WasmEdge_Proposal {
-      WasmEdge_Proposal_BulkMemoryOperations = 0,
+      WasmEdge_Proposal_ImportExportMutGlobals = 0,
+      WasmEdge_Proposal_NonTrapFloatToIntConversions,
+      WasmEdge_Proposal_SignExtensionOperators,
+      WasmEdge_Proposal_MultiValue,
+      WasmEdge_Proposal_BulkMemoryOperations,
       WasmEdge_Proposal_ReferenceTypes,
       WasmEdge_Proposal_SIMD,
       WasmEdge_Proposal_TailCall,
@@ -405,7 +409,15 @@ Developers can adjust the settings about the proposals, VM host pre-registration
     Developers can add or remove the proposals into the `Configure` context.
 
     ```c
-    /* By default, the bulk-memory-operations and reference-types proposals have turned on initially. */
+    /* 
+     * By default, the following proposals have turned on initially:
+     * * Import/Export of mutable globals
+     * * Non-trapping float-to-int conversions
+     * * Sign-extension operators
+     * * Multi-value returns
+     * * Bulk memory operations
+     * * Reference types
+     */
     WasmEdge_ConfigureContext *ConfCxt = WasmEdge_ConfigureCreate();
     WasmEdge_ConfigureAddProposal(ConfCxt, WasmEdge_Proposal_SIMD);
     WasmEdge_ConfigureRemoveProposal(ConfCxt, WasmEdge_Proposal_ReferenceTypes);
@@ -506,7 +518,6 @@ Developers can adjust the settings about the proposals, VM host pre-registration
     WasmEdge_ConfigureStatisticsSetTimeMeasuring(ConfCxt, TRUE);
     WasmEdge_ConfigureDelete(ConfCxt);
     ```
-
 
 ### Statistics
 
@@ -1148,7 +1159,7 @@ if (!WasmEdge_ResultOK(Res)) {
 /* The output AST module context should be destroyed. */
 WasmEdge_ASTModuleDelete(ASTCxt);
 
-/* Load WASM or compiled-WASM from the file. */
+/* Load WASM or compiled-WASM from the buffer. */
 Res = WasmEdge_LoaderParseFromBuffer(LoadCxt, &ASTCxt, Buf, FileSize);
 if (!WasmEdge_ResultOK(Res)) {
   printf("Loading phase failed: %s\n", WasmEdge_ResultGetMessage(Res));
